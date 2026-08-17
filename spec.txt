@@ -1,0 +1,176 @@
+##SPEC TERRAFORM
+
+aws --endpoint-url=http://localhost:4566 s3 ls --profile localstack
+
+##CRIAR ATALHO PARA O COMANDO ACIMA
+sed -i '/awslocal/d' ~/.bashrc - SE PRECISAR LIMPAR ALIASES ANTIGOS
+echo "alias awslocal='aws --endpoint-url=http://localhost:4566 --profile localstack'" >> ~/.bashrc
+source ~/.bashrc - ATUALIZAR O ALIAS
+
+
+export AWS_ACCESS_KEY_ID=test && export AWS_SECRET_ACCESS_KEY=test && export AWS_DEFAULT_REGION=us-east-1
+aws --endpoint-url=http://localhost:4566 s3 ls
+
+## COMANDOS PARA ESCOLHER BUCKETS EM ARQUIVOS DIFERENTES - SO EM LABORATÓRIO
+
+terraform plan -target=aws_s3_bucket.static_site (Este seria mais simples sem precisar declarar a variavel)
+terraform apply -var="bucket=site-estatico" (Este tem que acrescentar a varialvel no arquivo variables.tf e adicionar na declaração do bucket)
+
+http://localhost:4566/site-estatico/index.html
+
+###########################################################################################################################
+
+provider "aws" {
+  access_key                  = "test"
+  secret_key                  = "test"
+  region                      = "us-east-1"
+  
+  # Evita que o Terraform tente validar as credenciais nos servidores reais da AWS
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+
+  # Redireciona os serviços para o LocalStack
+  endpoints {
+    s3             = "http://localhost:4566"
+    dynamodb       = "http://localhost:4566"
+    lambda         = "http://localhost:4566"
+    iam            = "http://localhost:4566"
+  }
+}
+
+# Recurso de teste: Criação de um Bucket S3 local
+resource "aws_s3_bucket" "meu_bucket_local" {
+  bucket = "meu-primeiro-bucket-localstack"
+}
+
+terraform init
+terraform plan
+terraform apply
+terraform apply -auto-approve
+
+##COMANDO PARA USAR NO VI - ALTERAR NOME ##
+:%s/NOMEQUEVAIALTERAR/ALTERACAO/g
+
+
+## ESTE PROVIDER.TF COM VARIOS SERVIÇOS PARA RODAR IN LOCO ##
+
+provider "aws" {
+  region                      = "us-east-1"
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+  s3_use_path_style           = true
+  # Força o Terraform a usar http://localhost:4566/bucket em vez de http://bucket.localhost:4566
+  
+
+  endpoints {
+    apigateway       = "http://localhost:4566"
+    appconfig        = "http://localhost:4566"
+    appsync          = "http://localhost:4566"
+    athena           = "http://localhost:4566"
+    autoscaling      = "http://localhost:4566"
+    backup           = "http://localhost:4566"
+    batch            = "http://localhost:4566"
+    cloudcontrol     = "http://localhost:4566"
+    cloudformation   = "http://localhost:4566"
+    cloudfront       = "http://localhost:4566"
+    cloudtrail       = "http://localhost:4566"
+    cloudwatch       = "http://localhost:4566"
+    cloudwatchlogs   = "http://localhost:4566"
+    codecommit       = "http://localhost:4566"
+    cognitoidentity  = "http://localhost:4566"
+    cognitoidp       = "http://localhost:4566"
+    configservice    = "http://localhost:4566"
+    docdb            = "http://localhost:4566"
+    dynamodb         = "http://localhost:4566"
+    dynamodbstreams  = "http://localhost:4566"
+    ec2              = "http://localhost:4566"
+    ecr              = "http://localhost:4566"
+    ecs              = "http://localhost:4566"
+    efs              = "http://localhost:4566"
+    eks              = "http://localhost:4566"
+    elasticache      = "http://localhost:4566"
+    elasticbeanstalk = "http://localhost:4566"
+    elasticsearch    = "http://localhost:4566"
+    elb              = "http://localhost:4566"
+    elbv2            = "http://localhost:4566"
+    emr              = "http://localhost:4566"
+    events           = "http://localhost:4566"
+    firehose         = "http://localhost:4566"
+    glacier          = "http://localhost:4566"
+    glue             = "http://localhost:4566"
+    iam              = "http://localhost:4566"
+    iot              = "http://localhost:4566"
+    iotanalytics     = "http://localhost:4566"
+    kafka            = "http://localhost:4566"
+    kinesis          = "http://localhost:4566"
+    kinesisanalytics = "http://localhost:4566"
+    kms              = "http://localhost:4566"
+    lambda           = "http://localhost:4566"
+    logs             = "http://localhost:4566"
+    neptune          = "http://localhost:4566"
+    opensearch       = "http://localhost:4566"
+    organizations    = "http://localhost:4566"
+    qldb             = "http://localhost:4566"
+    rds              = "http://localhost:4566"
+    redshift         = "http://localhost:4566"
+    redshiftdata     = "http://localhost:4566"
+    resourcegroups   = "http://localhost:4566"
+    route53          = "http://localhost:4566"
+    route53resolver  = "http://localhost:4566"
+    s3               = "http://localhost:4566"
+    s3control        = "http://localhost:4566"
+    sagemaker        = "http://localhost:4566"
+    secretsmanager   = "http://localhost:4566"
+    serverlessrepo   = "http://localhost:4566"
+    ses              = "http://localhost:4566"
+    sesv2            = "http://localhost:4566"
+    sfn              = "http://localhost:4566"
+    sns              = "http://localhost:4566"
+    sqs              = "http://localhost:4566"
+    ssm              = "http://localhost:4566"
+    stepfunctions    = "http://localhost:4566"
+    sts              = "http://localhost:4566"
+    swf              = "http://localhost:4566"
+    timestreamwrite  = "http://localhost:4566"
+    transfer         = "http://localhost:4566"
+    transcribe       = "http://localhost:4566"
+    waf              = "http://localhost:4566"
+    wafv2            = "http://localhost:4566"
+    xray             = "http://localhost:4566"
+  }
+}
+
+##COMANDOS TECNICOS PARA O S3 - BUCKET ##
+
+awslocal s3 ls s3://nomedobucket
+# Cria um arquivo rápido de teste
+echo "Teste de upload no LocalStack" > teste.txt
+
+# Envia o arquivo para o bucket
+awslocal s3 cp teste.txt s3://nomedobucket/
+
+# Mostrar arquivo dentro do bucket
+awslocal s3 ls s3://nomebucket/
+
+#Enviar um Arquivo simulando uma Estrutura de Pastas
+awslocal s3 cp teste.txt s3://bucket-localstack/uploads/documentos/teste_pasta.txt
+
+##Baixar o Arquivo do Seu BucketPara baixar o arquivo que você acabou de subir de volta para o seu computador com outro nome
+awslocal s3 cp s3://bucket-localstack/teste.txt ./arquivo_recuperado.txt
+
+##Excluir Arquivos do Seu Bucket
+awslocal s3 rm s3://bucket-localstack/teste.txt
+
+##Limpar Todo o Bucket de uma Vez
+awslocal s3 rm s3://bucket-localstack --recursive
+##########################################################################################
+##COMANDOS EC2 - TERRAFORM
+awslocal ec2 describe-instances
+terraform show 
+terraform state list
+
+
